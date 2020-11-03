@@ -10,3 +10,10 @@ usethis::use_r("data_wildfinder") # Will generate the R folder to store function
 # Add dependencies to the DESCRIPTION files
 usethis::use_package("here")
 usethis::use_package("readr")
+
+
+# Move the one already present that describe the data
+# Can be done fro the explorer inside RStudio => More => Move
+
+# Add a new READ ME, specific to Compendium, at the root of the project
+rrtools::use_readme_rmd()
