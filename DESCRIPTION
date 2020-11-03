@@ -6,7 +6,8 @@ Authors@R:
            family = "Dore",
            role = c("aut", "cre"),
            email = "mael.dore@gmail.com")
-Description: Research Compendium for exercices for the CESAB Datatoolbox Formation
+Description: Research Compendium for exercices 
+             for the CESAB Datatoolbox Formation
 License: MIT + file LICENSE
 ByteCompile: true
 Encoding: UTF-8

@@ -11,9 +11,34 @@ usethis::use_r("data_wildfinder") # Will generate the R folder to store function
 usethis::use_package("here")
 usethis::use_package("readr")
 
+### Manage READ ME
 
 # Move the one already present that describe the data
 # Can be done fro the explorer inside RStudio => More => Move
 
 # Add a new READ ME, specific to Compendium, at the root of the project
 rrtools::use_readme_rmd()
+
+### Load dependencies
+
+# Installer ou MAJ les packages dont dépend le Compendium (listés dans DESCRIPTION)
+devtools::install_deps()
+
+### Generate documentation for all our fonctions
+
+# NAMESPACE is updated
+
+# Create the "./man/" folder
+devtools::document()
+
+# Check the integrity of the Compendium
+devtools::check()
+
+### Try your functions
+
+ecoregions_df <- datatoolboxexos::data_ecoregions()
+
+# Inspect doc for a function
+?data_ecoregions
+?datatoolboxexos::data_ecoregions()
+
