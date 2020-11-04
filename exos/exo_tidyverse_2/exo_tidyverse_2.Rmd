@@ -1,0 +1,95 @@
+---
+title: "Data Manipulation "
+author: "mael.dore@gmail.com"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    keep_md: yes
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r data_transfo}
+
+library(tidyverse)
+
+# Load data
+citations_raw <- readr::read_csv('https://raw.githubusercontent.com/oliviergimenez/intro_tidyverse/master/journal.pone.0166570.s001.CSV')
+
+citations_raw
+print(citations_raw)
+
+# Transform data
+citations <- citations_raw %>% 
+  # Rename columns to avoid space and strange character
+  dplyr::rename(journal = 'Journal identity',
+                impactfactor = '5-year journal impact factor',
+                pubyear = 'Year published',
+                colldate = 'Collection date',
+                pubdate = 'Publication date',
+                nbtweets = 'Number of tweets',
+                woscitations = 'Number of Web of Science citations') %>% 
+  # Change to factor level the journal
+  dplyr::mutate(journal = as.factor(journal)) %>%  
+  # Separate values in a unique column into several
+  tidyr::separate(col = pubdate,
+                  into = c('month','day','year'),
+                  sep = '/',
+                  remove = F) %>%   
+  # Create data under proper format
+  dplyr::mutate(pubdate = lubridate::mdy(pubdate),
+                colldate = lubridate::mdy(colldate),
+                pubyear2 = lubridate::year(pubdate))
+
+# Extract some authors name
+citations %>% 
+  # Use str expression to detect rows with more than 3 authors and IF > 5
+  dplyr::filter(str_detect(Authors,'et al'), impactfactor < 5) %>%
+  # Change for lower cases 
+  dplyr::mutate(authors_lowercase = str_to_lower(Authors)) %>%
+  # And extract the variable for Authors names
+  dplyr::pull(authors_lowercase)
+
+# Extract journal names afeter removing the spaces
+citations %>%
+  dplyr::mutate(journal = str_remove_all(journal," ")) %>%
+  dplyr::select(journal) %>%
+  unique() %>%
+  head(5)
+
+# Nb of citations per journals, sorted
+citations %>% dplyr::count(journal,
+                           wt = nbtweets, # Weights = multiplier
+                           sort = TRUE)
+
+# Mean nb of tweets per journal
+citations %>%
+  dplyr::group_by(journal) %>%
+  dplyr::summarise(avg_tweets = mean(nbtweets)) %>%
+  ungroup() %>% 
+  # Reorder by decreasing order
+  dplyr::arrange(desc(avg_tweets)) %>%
+  head(10)
+
+# Apply function on a selection of column with across
+citations %>%
+  dplyr::group_by(journal) %>%
+  dplyr::summarize(dplyr::across(dplyr::where(is.numeric), mean)) %>%
+  head()
+
+?group_by
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
